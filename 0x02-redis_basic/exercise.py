@@ -39,7 +39,7 @@ class Cache:
         _redis: private instance of redis
         flushdb: to delete all in the db
         """
-        self._redis = redis.Redis(host="172.17.0.2", port=6379, db=0)
+        self._redis = redis.Redis()
         self._redis.flushdb()
 
     @count_calls
@@ -63,6 +63,26 @@ class Cache:
             data = fn(data)
 
         return data
+
+    def replay(method: Callable) -> None:
+        """function to display the history of calls of a particular function.
+        Args:
+            method: the function to display its history
+
+        Return:
+            None
+        """
+        Cache = redis.Redis()
+        name = method.__qualname__
+        calls = Cache.get(name).decode("utf-8")
+        input_key = f"{name}:input"
+        output_key = f"{name}:output"
+        inputs = Cache.lrange(input_key, 0, -1)
+        outputs = Cache.lrange(output_key, 0, -1)
+        print(f"{name} was called {calls} times")
+
+        for i, o in zip(inputs, outputs):
+            print(f"{name}(*{i.decode('utf-8')} -> {o.decode('utf-8')}")
 
     def get_str(self, key: str) -> str:
         """get cache in string"""

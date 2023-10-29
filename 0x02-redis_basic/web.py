@@ -13,9 +13,11 @@ def get_page(url: str) -> str:
     Returns:
         str(the page content)
     """
+    key = f"count:{url}"
     r = redis.Redis()
-
+    
+    r.incr('Count')
     content = requests.get(url).text
-    r.setex(f"count:{url}", 10, f"{content}")
+    r.setex(key, 10, content)
 
     return content

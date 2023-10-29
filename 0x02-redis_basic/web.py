@@ -12,14 +12,14 @@ def count(method: Callable) -> Callable:
     """decorator to count """
     @wraps(method)
     def wrapper(url):
-        count_key = f"count:{url}"
+        count_key = f'count:{url}'
         _redis.incr(count_key)
-        cached = _redis.get(f"{url}")
+        cached = _redis.get(f'{url}')
 
         if cached:
-            return cached.decode("utf-8")
+            return cached.decode('utf-8')
         content = method(url)
-        _redis.setex(f"{url}", 10, f"{content}")
+        _redis.set(f'{url}', content, 10)
         return content
     return wrapper
 
@@ -34,6 +34,6 @@ def get_page(url: str) -> str:
     Returns:
         str(the page content)
     """
-    content = requests.get(url).text
+    content = requests.get(url)
 
-    return content
+    return content.text

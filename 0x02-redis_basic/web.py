@@ -13,14 +13,13 @@ def count(method: Callable) -> Callable:
     @wraps(method)
     def wrapper(url):
         count_key = f"count:{url}"
-        cached_key = f"cached:{url}"
         _redis.incr(count_key)
-        cached = _redis.get(f"{cached_key}")
+        cached = _redis.get(f"{url}")
 
         if cached:
             return cached.decode("utf-8")
         content = method(url)
-        _redis.setex(f"{cached_key}", 10, f"{content}")
+        _redis.setex(f"{url}", 10, f"{content}")
         return content
     return wrapper
 

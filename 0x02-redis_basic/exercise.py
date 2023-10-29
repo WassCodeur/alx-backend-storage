@@ -49,7 +49,7 @@ def replay(method: Callable) -> None:
     print(f"{name} was called {calls} times:")
 
     for i, o in zip(inputs, outputs):
-        print(f"{name}(*{i.decode('utf-8')},) -> {o.decode('utf-8')}")
+        print(f"{name}(*{i.decode('utf-8')}) -> {o.decode('utf-8')}")
 
 
 class Cache:

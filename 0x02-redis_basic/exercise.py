@@ -46,7 +46,7 @@ def replay(method: Callable) -> None:
     output_key = f"{name}:output"
     inputs = Cache.lrange(input_key, 0, -1)
     outputs = Cache.lrange(output_key, 0, -1)
-    print(f"{name} was called {calls} times")
+    print(f"{name} was called {calls} times:")
 
     for i, o in zip(inputs, outputs):
         print(f"{name}(*{i.decode('utf-8')} -> {o.decode('utf-8')}")

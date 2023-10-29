@@ -32,6 +32,26 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
+def replay(method: Callable) -> None:
+    """function to display the history of calls of a particular function.
+    Args:
+        method: the function to display its history
+    Returns:
+         None
+    """
+    Cache = redis.Redis()
+    name = method.__qualname__
+    calls = Cache.get(name).decode("utf-8")
+    input_key = f"{name}:input"
+    output_key = f"{name}:output"
+    inputs = Cache.lrange(input_key, 0, -1)
+    outputs = Cache.lrange(output_key, 0, -1)
+    print(f"{name} was called {calls} times")
+
+    for i, o in zip(inputs, outputs):
+        print(f"{name}(*{i.decode('utf-8')} -> {o.decode('utf-8')}")
+
+
 class Cache:
     """class Cache to store cache"""
     def __init__(self):
@@ -63,26 +83,6 @@ class Cache:
             data = fn(data)
 
         return data
-
-    def replay(method: Callable) -> None:
-        """function to display the history of calls of a particular function.
-        Args:
-            method: the function to display its history
-
-        Return:
-            None
-        """
-        Cache = redis.Redis()
-        name = method.__qualname__
-        calls = Cache.get(name).decode("utf-8")
-        input_key = f"{name}:input"
-        output_key = f"{name}:output"
-        inputs = Cache.lrange(input_key, 0, -1)
-        outputs = Cache.lrange(output_key, 0, -1)
-        print(f"{name} was called {calls} times")
-
-        for i, o in zip(inputs, outputs):
-            print(f"{name}(*{i.decode('utf-8')} -> {o.decode('utf-8')}")
 
     def get_str(self, key: str) -> str:
         """get cache in string"""
